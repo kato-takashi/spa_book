@@ -22,14 +22,19 @@ spa.shell = (function () {
     + '<div class="spa-shell-foot"></div>'
     + '<div class="spa-shell-chat"></div>'
     + '<div class="spa-shell-modal"></div>',
-    chat_extend_time    : 1000,
-    chat_retract_time   : 300,
-    chat_extend_height  : 450,
-    chat_retract_height : 15
+    chat_extend_time     : 1000,
+    chat_retract_time    : 300,
+    chat_extend_height   : 450,
+    chat_retract_height  : 15,
+    chat_extended_title  : 'Click to retract',
+    chat_retracted_title : 'Click to extend'
   },
-  stateMap = {$container: null},
+  stateMap = {
+    $container: null,
+    is_chat_retracted : true
+  },
   jqueryMap = {},
-  setJqueryMap, initModule;
+  setJqueryMap, initModule, onClickChat;
   //----------------- モジュールスコープ変数終了 ---------------
   //-------------------- ユーティリティメソッド開始 ------------
   //--------------------- ユーティリティメソッド終了 -----------
@@ -55,6 +60,9 @@ spa.shell = (function () {
   // *true-スタイだーアニメーションが開始された
   // *false-スライダーアニメーションが開始されなかった
   //
+  //状態:stateMap.is.chatretractedを否定する
+  //※true -スライダーは格納されている
+  // *false　スライダーは拡大されている
   toggleChat = function(do_extend, callback){
     var px_chat_ht = jqueryMap.$chat.height(),
     is_open = px_chat_ht === configMap.chat_extend_height,
@@ -72,6 +80,8 @@ spa.shell = (function () {
         {height:configMap.chat_extend_height},
         configMap.chat_extend_time,
         function(){
+          jqueryMap.$chat.attr('title', configMap.chat_extend_title);
+          stateMap.is_chat_retracted = false;
           if(callback){
             callback(jqueryMap.$chat);
           }
@@ -81,11 +91,14 @@ spa.shell = (function () {
     }
     //チャットスライダーの拡大終了
 
+
     //チャットスライダーの格納開始
     jqueryMap.$chat.animate({
       height: configMap.chat_retract_height},
       configMap.chat_retract_time,
       function(){
+        jqueryMap.$chat.attr('title', configMap.chat_extend_title);
+        stateMap.is_chat_retracted = true;
         if(callback){
           callback(jqueryMap.$chat);
         }
@@ -98,6 +111,10 @@ spa.shell = (function () {
 
   //--------------------- DOMメソッド終了 ----------------------
   //------------------- イベントハンドラ開始 -------------------
+  onClickChat = function(event){
+    toggleChat(stateMap.is_chat_retracted);
+    return false;
+  };
   //-------------------- イベントハンドラ終了 -------------------
   //------------------- パブリックメソッド開始 ------------------
   //パブリックメソッド/initMdule/開始
@@ -107,14 +124,18 @@ spa.shell = (function () {
     $container.html(configMap.main_html);
     setJqueryMap();
 
-    //切り替えテストをする
-    setTimeout(function(){
-      toggleChat(true);
-    }, 3000);
+    //チャットスライダーを初期化し、クリックハンドドラをバインドする
+    stateMap.is_chat_retracted = true;
+    jqueryMap.$chat.attr('title', configMap.chat_retracted_title).click(onClickChat);
 
-    setTimeout(function(){
-      toggleChat(false);
-    }, 8000);
+    //切り替えテストをする
+    // setTimeout(function(){
+    //   toggleChat(true);
+    // }, 3000);
+    //
+    // setTimeout(function(){
+    //   toggleChat(false);
+    // }, 8000);
   };
 
   //パブリックメソッド/initModule/終了
