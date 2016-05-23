@@ -146,7 +146,7 @@ spa.shell = (function () {
       if(arg_map.hasOwnProperty(key_name)){
         //反復中に従属キーを飛ばす
         if ( key_name.indexOf( '_' ) === 0){continue KEYVAL;}
-        
+
 
         //独立キー値を更新する
         anchor_map_revise[key_name] = arg_map[key_name];
@@ -270,6 +270,10 @@ spa.shell = (function () {
     $.uriAnchor.configModule({
       schema_map: configMap.anchor_schema_map
     });
+
+    //機能モジュールを構成して初期化する
+    spa.chat.configModule({});
+    spa.chat.initModule(jqueryMap.$chat);
 
     //URIアンカー変更イベントを処理する
     //これはすべての機能モジュールを設定して初期化した後に行う
